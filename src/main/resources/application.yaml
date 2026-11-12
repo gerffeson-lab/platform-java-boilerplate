@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: platform-java-boilerplate
+
+server:
+  port: 8080
+  shutdown: graceful
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true # /actuator/health/liveness e /actuator/health/readiness
+
+logging:
+  structured:
+    format:
+      console: ecs # logs JSON no padrão Elastic (ECS); padrão final definido por Operações

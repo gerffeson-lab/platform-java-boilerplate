@@ -1,0 +1,31 @@
+# Metadados para o catálogo de serviços (formato Backstage / Red Hat Developer Hub).
+# Não é usado no MVP, mas deixa o serviço pronto para um IDP futuro.
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: platform-java-boilerplate
+  description: Walking skeleton do golden path
+  annotations:
+    github.com/project-slug: gerffeson-lab/platform-java-boilerplate
+    backstage.io/techdocs-ref: dir:.
+  tags: [java, spring-boot]
+spec:
+  type: service
+  lifecycle: experimental
+  owner: group:plataforma
+  system: acme
+  providesApis:
+    - platform-java-boilerplate-api
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: platform-java-boilerplate-api
+  description: Contrato OpenAPI do platform-java-boilerplate
+spec:
+  type: openapi
+  lifecycle: experimental
+  owner: group:plataforma
+  system: acme
+  definition:
+    $text: ./api/openapi.yaml

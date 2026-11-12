@@ -1,0 +1,15 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [develop, main, 'release/**']
+    tags: ['v*']
+
+permissions:
+  contents: read
+  packages: write # publicar a imagem no registry
+
+jobs:
+  ci:
+    uses: gerffeson-lab/platform-pipelines-templates/.github/workflows/ci-java.yaml@v1
