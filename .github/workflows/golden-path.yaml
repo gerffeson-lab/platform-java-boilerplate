@@ -1,0 +1,49 @@
+# Só existe no template (o .golden-path/personalizar remove este arquivo no serviço gerado).
+# Prova que o boilerplate continua personalizável: gera um serviço de exemplo como o
+# self-service faria, confere que não sobrou nome do template e roda o build.
+name: golden-path
+
+on:
+  pull_request:
+  push:
+    branches: [develop, main]
+
+permissions:
+  contents: read
+
+jobs:
+  personalizar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Gerar serviço de exemplo
+        env:
+          GP_ORG: ${{ github.repository_owner }}
+          GP_NOME: xyz-produto-exemplo
+          GP_SIGLA: xyz
+          GP_PRODUTO: produto
+          GP_APLICACAO: exemplo
+          GP_TIME: time-exemplo
+          GP_DESCRICAO: "Serviço de exemplo: \"aspas\" e acentuação"
+        run: |
+          cp -r . "$RUNNER_TEMP/servico"
+          cd "$RUNNER_TEMP/servico"
+          rm -rf .git
+          .golden-path/personalizar
+          rm -rf .golden-path
+          if grep -rniE 'platform-?java-?boilerplate|group:plataforma' --exclude-dir=target .; then
+            echo "::error::Sobrou nome do template no serviço gerado."; exit 1
+          fi
+          test ! -e .github/workflows/golden-path.yaml
+          python3 -c 'import sys, yaml; list(yaml.safe_load_all(open("catalog-info.yaml")))'
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+
+      - name: Build do serviço gerado
+        run: mvn -B -ntp verify
+        working-directory: ${{ runner.temp }}/servico

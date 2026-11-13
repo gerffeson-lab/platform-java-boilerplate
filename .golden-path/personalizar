@@ -1,0 +1,102 @@
+#!/usr/bin/env python3
+"""Personaliza um repositório gerado a partir deste boilerplate.
+
+Contrato com o self-service da plataforma (platform-self-service):
+- Roda na raiz do repositório recém-gerado, sem token nem credenciais no ambiente.
+- Recebe o pedido em variáveis de ambiente GP_* (já validadas pelo self-service):
+    GP_ORG, GP_NOME (<sigla>-<produto>-<aplicação>), GP_SIGLA, GP_PRODUTO,
+    GP_APLICACAO, GP_TIME, GP_DESCRICAO
+- Depois que este script termina, o self-service apaga `.golden-path/` e publica o resultado.
+
+O boilerplate continua compilável (sem placeholders); a troca acontece aqui. Quem mantém o
+boilerplate mantém este script, e o workflow golden-path.yaml prova que o resultado compila."""
+
+import json
+import os
+import re
+import shutil
+import sys
+
+TEMPLATE_NAME = "platform-java-boilerplate"   # artifactId, nome da aplicação, catálogo
+TEMPLATE_PACKAGE = "platformjavaboilerplate"  # com.acme.platformjavaboilerplate
+TEMPLATE_CLASS = "PlatformJavaBoilerplate"    # PlatformJavaBoilerplateApplication
+TEMPLATE_TEAM = "plataforma"                  # time dono no catalog-info e no CODEOWNERS
+TEMPLATE_SYSTEM = "system: acme"              # system (sigla) no catalog-info
+TEMPLATE_DESCRICAO = "description: Walking skeleton do golden path"
+JAVA_ROOTS = ("src/main/java/com/acme", "src/test/java/com/acme")
+# Só do template: não vão para o serviço gerado
+REMOVER = (".github/workflows/golden-path.yaml",)
+SKIP_DIRS = {".git", ".golden-path", "target"}
+# Trechos entre estes marcadores (ex.: no README) só fazem sentido no template
+TRECHO_TEMPLATE = re.compile(r"<!-- golden-path:inicio.*?<!-- golden-path:fim -->\n\n?", re.S)
+SLUG = re.compile(r"[a-z][a-z0-9]*(?:-[a-z0-9]+)*")
+
+
+def entrada(chave: str, padrao: re.Pattern | None = SLUG) -> str:
+    valor = os.environ.get(chave, "").strip()
+    if padrao and not padrao.fullmatch(valor):
+        sys.exit(f"{chave} inválido: {valor!r}")
+    return valor
+
+
+def arquivos(root: str):
+    for dirpath, dirnames, filenames in os.walk(root):
+        dirnames[:] = [d for d in dirnames if d not in SKIP_DIRS]
+        for filename in filenames:
+            yield os.path.join(dirpath, filename)
+
+
+def main() -> None:
+    org = entrada("GP_ORG", re.compile(r"[A-Za-z0-9][A-Za-z0-9-]*"))
+    nome, sigla, time = entrada("GP_NOME"), entrada("GP_SIGLA"), entrada("GP_TIME")
+    descricao = " ".join(entrada("GP_DESCRICAO", None).split())
+    pacote, classe = nome.replace("-", ""), "".join(p.capitalize() for p in nome.split("-"))
+    root = os.getcwd()
+
+    # 1. Pacote Java
+    for base in JAVA_ROOTS:
+        antigo = os.path.join(root, base, TEMPLATE_PACKAGE)
+        if os.path.isdir(antigo):
+            shutil.move(antigo, os.path.join(root, base, pacote))
+
+    # 2. Arquivos com o nome da classe do boilerplate
+    for path in list(arquivos(root)):
+        nome_arq = os.path.basename(path)
+        if TEMPLATE_CLASS in nome_arq:
+            os.rename(path, os.path.join(os.path.dirname(path), nome_arq.replace(TEMPLATE_CLASS, classe)))
+
+    # 3. Conteúdo (do mais específico para o mais geral)
+    trocas = [
+        (f"com.acme.{TEMPLATE_PACKAGE}", f"com.acme.{pacote}"),
+        (TEMPLATE_CLASS, classe),
+        (TEMPLATE_NAME, nome),
+        (f"group:{TEMPLATE_TEAM}", f"group:{time}"),
+        (f"@{org}/{TEMPLATE_TEAM}", f"@{org}/{time}"),
+        (TEMPLATE_SYSTEM, f"system: {sigla}"),
+    ]
+    if descricao:
+        trocas.append((TEMPLATE_DESCRICAO, f"description: {json.dumps(descricao, ensure_ascii=False)}"))
+    alterados = 0
+    for path in arquivos(root):
+        try:
+            with open(path, encoding="utf-8") as fh:
+                conteudo = fh.read()
+        except (UnicodeDecodeError, OSError):
+            continue  # binário
+        novo = TRECHO_TEMPLATE.sub("", conteudo)
+        for antigo, novo_valor in trocas:
+            novo = novo.replace(antigo, novo_valor)
+        if novo != conteudo:
+            with open(path, "w", encoding="utf-8") as fh:
+                fh.write(novo)
+            alterados += 1
+
+    for rel in REMOVER:
+        if os.path.exists(os.path.join(root, rel)):
+            os.remove(os.path.join(root, rel))
+
+    print(f"{nome}: {alterados} arquivos personalizados (pacote com.acme.{pacote}, time {time}, sigla {sigla}).")
+
+
+if __name__ == "__main__":
+    main()
