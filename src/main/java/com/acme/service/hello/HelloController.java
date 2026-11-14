@@ -1,7 +1,7 @@
-package com.acme.platformjavaboilerplate.hello;
+package com.acme.service.hello;
 
-import com.acme.platformjavaboilerplate.api.HelloApi;
-import com.acme.platformjavaboilerplate.api.model.HelloResponse;
+import com.acme.service.api.HelloApi;
+import com.acme.service.api.model.HelloResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 

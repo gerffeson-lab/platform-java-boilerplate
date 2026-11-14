@@ -1,6 +1,7 @@
 spring:
   application:
-    name: platform-java-boilerplate
+    # Nome real injetado pelo deploy (nome do repositório), igual nos logs e traces
+    name: ${SPRING_APPLICATION_NAME:service}
 
 server:
   port: 8080

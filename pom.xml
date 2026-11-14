@@ -12,9 +12,9 @@
   </parent>
 
   <groupId>com.acme</groupId>
-  <artifactId>platform-java-boilerplate</artifactId>
+  <artifactId>service</artifactId>
   <version>0.1.0-SNAPSHOT</version>
-  <name>platform-java-boilerplate</name>
+  <name>service</name>
   <description>Walking skeleton do golden path: Spring Boot + contrato OpenAPI (API First)</description>
 
   <properties>
@@ -64,8 +64,8 @@
             <configuration>
               <inputSpec>${project.basedir}/api/openapi.yaml</inputSpec>
               <generatorName>spring</generatorName>
-              <apiPackage>com.acme.platformjavaboilerplate.api</apiPackage>
-              <modelPackage>com.acme.platformjavaboilerplate.api.model</modelPackage>
+              <apiPackage>com.acme.service.api</apiPackage>
+              <modelPackage>com.acme.service.api.model</modelPackage>
               <generateSupportingFiles>false</generateSupportingFiles>
               <configOptions>
                 <interfaceOnly>true</interfaceOnly>
