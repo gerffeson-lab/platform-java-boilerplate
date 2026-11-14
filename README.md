@@ -1,10 +1,14 @@
-# platform-java-boilerplate
+# Serviço Java / Spring Boot
 
-Walking skeleton do golden path: um serviço Spring Boot mínimo que já nasce com contrato
-OpenAPI, esteira de CI, imagem de container e metadados de catálogo.
+Criado a partir do golden path Java/Spring: um serviço Spring Boot mínimo que já nasce com
+contrato OpenAPI, esteira de CI e imagem de container.
 
-> Repositório **template**. Não crie serviços clonando à mão: peça um novo serviço em
-> `platform-self-service` e o repositório é criado automaticamente.
+O template não carrega a identidade do serviço. O time dono está no `CODEOWNERS` (gravado na
+criação) e o nome em runtime (logs, traces, Kubernetes) vem do deploy, a partir do nome do
+repositório. Sigla, produto e time ficam nas custom properties do repositório.
+
+> No repositório template (`platform-java-boilerplate`): não crie serviços clonando à mão.
+> Peça um novo serviço em `platform-self-service`.
 
 ## Contrato do repositório
 
@@ -19,7 +23,6 @@ OpenAPI, esteira de CI, imagem de container e metadados de catálogo.
 | Porta | `8080` |
 | Health checks | `/actuator/health/liveness` e `/actuator/health/readiness` |
 | Logs | JSON (ECS) no stdout |
-| Catálogo | `catalog-info.yaml` (pronto para um IDP futuro) |
 | Documentação | `docs/` + `mkdocs.yml` |
 
 ## Desenvolvimento

@@ -1,4 +1,4 @@
-# platform-java-boilerplate
+# Documentação do serviço
 
 Documentação do serviço. Mantida no próprio repositório (docs-as-code).
 
