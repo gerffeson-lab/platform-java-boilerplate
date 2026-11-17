@@ -1,0 +1,2 @@
+# Só o que muda em produção. Também existem values-dev.yaml e values-hml.yaml, se precisar.
+replicas: 2

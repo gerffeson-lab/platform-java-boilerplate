@@ -13,4 +13,7 @@ permissions:
 jobs:
   ci:
     uses: gerffeson-lab/platform-pipelines-templates/.github/workflows/ci-java.yaml@v1
-    secrets: inherit # SONAR_TOKEN da org (SAST obrigatório)
+    with:
+      # o repositório template não é implantado; os serviços criados dele, sim
+      deploy: ${{ !github.event.repository.is_template }}
+    secrets: inherit # GITOPS_DEPLOY_KEY da org (deploy no repo GitOps)
