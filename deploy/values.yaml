@@ -1,0 +1,27 @@
+# Como o serviço roda, em todos os ambientes. Contrato: chart `app` da plataforma
+# (github.com/gerffeson-lab/platform-helm-charts). Campos fora do contrato são recusados
+# na esteira.
+#
+# Não precisa (e não pode) informar nome, namespace, imagem ou ambiente: a esteira
+# preenche a partir do nome do repositório, das custom properties e da imagem publicada.
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 384Mi
+  limits:            # teto da plataforma: 2 CPU / 4Gi por container
+    cpu: "1"
+    memory: 768Mi
+
+env:
+  # nome do serviço nos logs: o mesmo do repositório
+  SPRING_APPLICATION_NAME: "{{ .Values.platform.name }}"
+
+probes:
+  liveness: /actuator/health/liveness
+  readiness: /actuator/health/readiness
+  startupSeconds: 180
+
+# exposição fora do cluster (OpenShift Route); deixe desligado para APIs internas
+route:
+  enabled: false

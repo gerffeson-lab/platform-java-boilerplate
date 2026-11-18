@@ -23,6 +23,7 @@ repositório. Sigla, produto e time ficam nas custom properties do repositório.
 | Porta | `8080` |
 | Health checks | `/actuator/health/liveness` e `/actuator/health/readiness` |
 | Logs | JSON (ECS) no stdout |
+| Deploy | `deploy/values.yaml` (+ `values-<dev\|hml\|prd>.yaml`), contrato do chart `app` da plataforma |
 | Documentação | `docs/` + `mkdocs.yml` |
 
 ## Desenvolvimento
@@ -35,6 +36,12 @@ repositório. Sigla, produto e time ficam nas custom properties do repositório.
 mvn verify
 mvn spring-boot:run
 ```
+
+## Deploy
+
+Push em `develop`, `release/*` ou `main` publica a imagem e grava os manifestos no repo
+GitOps; o Argo CD implanta em dev, hml ou prd. O time só ajusta `deploy/values*.yaml`
+(recursos, réplicas, variáveis, probes, Route).
 
 ## Fluxo de branches (GitFlow)
 
